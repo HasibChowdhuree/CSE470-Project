@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="base::header">
+    <nav th:replace="base::navbar"></nav>
+</head>
+<body>
+    <div class="column is-half is-offset-one-quarter center">
+        <p>New Signup</p>
+    </div>
+    <div class="card column is-half is-offset-one-quarter">     
+      <form th:action="@{/signup/{type}(type=${type})}" method="post">
+        <div th:if="${session.message}" th:classappend="${session.message.type}" class="alert" role="alert">
+          <p class="text-center" th:text="${session.message.content}"> <p>
+          <th:block th:text="${#session.removeAttribute('message')}"></th:block>
+        </div>
+        <div class="field">
+            <label class="label">Full Name</label>
+            <div class="control has-icons-left has-icons-right">
+              <input class="input is-success" name="fullname" type="text" placeholder="Full Name">
+              <span class="icon is-small is-left">
+                <i class="fas fa-user"></i>
+              </span>
+            </div>
+            <!-- <p class="help is-success">This username is available</p> -->
+          </div>
+          
+          <div class="field">
+            <label class="label">Email</label>
+            <div class="control has-icons-left has-icons-right">
+              <input class="input is-success" name="email" type="email" placeholder="Email input">
+              <span class="icon is-small is-left">
+                <i class="fas fa-envelope"></i>
+              </span>
+
+            </div>
+            <!-- <p class="help is-danger">This email is invalid</p> -->
+          </div>
+          <div class="field">
+            <label class="label">Password</label>
+            <p class="control has-icons-left">
+              <input class="input is-success" name="password" type="password" placeholder="Password">
+              <span class="icon is-small is-left">
+                <i class="fas fa-lock"></i>
+              </span>
+            </p>
+          </div>
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox">
+                I agree to the <a href="#">terms and conditions</a>
+              </label>
+            </div>
+          </div>
+          
+          
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-success">Submit</button>
+            </div>
+            <div class="control">
+              <button class="button is-danger is-light">Cancel</button>
+            </div>
+          </div>
+        </form>
+    </div>
+</body>
+</html>

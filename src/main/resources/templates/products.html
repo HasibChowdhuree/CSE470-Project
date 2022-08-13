@@ -1,0 +1,98 @@
+<html lang="en">
+<head th:replace="base::header">
+    <nav th:replace="base::navbar"></nav>
+</head>
+<body>
+    <br>
+    <div class="container">
+      <form th:action="@{/products}" method="post">
+      <div class="columns is-centered">
+        <div class="column is-5">
+          <input class="input" name="name" type="text" placeholder="search a product">
+        </div>
+        <div class="column is-2">
+            <div class="select">
+              <select name="sort">
+                <option selected disabled>Sort by price</option>
+                <option>Sort by price (Low to High)</option>
+                <option>Sort by price (High to Low)</option>
+              </select>
+            </div>
+        </div>
+        <div class="column is-2">
+          <div class="select">
+            <select name="search_type">
+              <option>Search Product</option>
+              <option>Search Shop</option>
+            </select>
+          </div>
+      </div>
+      <div class="column is-2">
+        <div class="select">
+          <select name="category">
+            <option selected disabled>Category</option>
+            <div th:each="category: ${categories}">
+              <option th:text="${category.name}"></option>
+            </div>
+          </select>
+        </div>
+    </div>
+        <div class="column is-1 is-narrow">
+          <button class="button is-info">Search</button>
+        </div>
+      </div>
+    </form>
+    </div>
+
+    <div class="container">
+    <div class="columns is-multiline is-centered">
+            <div th:if="${products!=null}" th:each="product: ${products}" class="column is-one-quarter ">
+              <a th:href="@{/product/{id}(id=${product.id})}">
+                <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img th:src="'data:image/png;base64,' + ${product.setImageBase64(product.image)}" alt="Placeholder image">
+                      </figure>
+                    </div>
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-content">
+                          <p class="title is-4" th:text="${product.name}"></p>
+                        </div>
+                      </div>                 
+                      <div class="content">
+                        <p th:text="${'Price: $' + product.price}"></p>
+                        <p th:text="${'Quantity: ' + product.quantity}"></p>
+                        <br>
+                        <a th:href="@{/add-to-cart/{id}(id=${product.id})}" class="button is-info"><i class="fas fa-solid fa-cart-plus"></i></a>
+                        <a class="button is-danger is-pulled-right" th:href="@{/customer/add-favorite/{id}(id=${product.id})}"><i class="fas fa-solid fa-heart"></i></a>
+                      </div>
+                    </div>
+                  </div>   
+                  </a>     
+            </div>
+            <div th:if="${shops!=null}" th:each="shop: ${shops}" class="column is-one-quarter ">
+              <a th:href="@{/shop/{id}(id=${shop.id})}">
+                <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img src="/img/shopicon.jpg" alt="Placeholder image">
+                      </figure>
+                    </div>
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-content">
+                          <p class="title is-4" th:text="${shop.name}"></p>
+                        </div>
+                      </div>                  
+                      <div class="content">
+                        <p th:text="${'Description: ' + shop.description}"></p>
+                      </div>
+                    </div>
+                  </div>   
+                  </a>     
+            </div>
+      </div>
+    </div>  
+</body>
+</html>
