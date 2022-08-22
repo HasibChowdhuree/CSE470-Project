@@ -76,16 +76,16 @@ public class MainController {
 		model.addAttribute("products", products);
 		List<Product> featured = new ArrayList<>();
 		for(Product product: products){
-			if(product.getId()==6 ){
+			if(product.getId()==8 ){
 				featured.add(product);
 			}
-			if(product.getId()==18 ){
+			if(product.getId()==11 ){
 				featured.add(product);
 			}
-			if(product.getId()==22 ){
+			if(product.getId()==19 ){
 				featured.add(product);
 			}
-			if(product.getId()==23 ){
+			if(product.getId()==20 ){
 				featured.add(product);
 			}
 		}
