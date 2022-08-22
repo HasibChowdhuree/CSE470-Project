@@ -9,7 +9,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -20,12 +22,26 @@ public class Order {
 	@Column(name = "id")
 	private int id;
 	private String name;
-    private int quantity;
+	private String number;
+	private String address;
+    public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getNumber() {
+		return number;
+	}
+	public void setNumber(String number) {
+		this.number = number;
+	}
+	private int quantity;
     // @OneToOne(cascade = CascadeType.ALL,fetch =FetchType.LAZY)
     // private Shop shop;
-    @OneToMany(cascade = CascadeType.ALL,fetch =FetchType.LAZY)
+    @ManyToMany(fetch =FetchType.LAZY)
     private List<Product> products;
-	private int total;
+	private double total;
     public int getId() {
 		return id;
 	}
@@ -44,22 +60,17 @@ public class Order {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-    // public Shop getShop() {
-	// 	return shop;
-	// }
-	// public void setShop(Shop shop) {
-	// 	this.shop = shop;
-	// }
+
     public List<Product> getProducts() {
 		return this.products;
 	}
 	public void setProducts(List<Product> products) {
 		this.products = products;
 	}
-	public int getTotal() {
+	public double getTotal() {
 		return total;
 	}
-	public void setTotal(int total) {
+	public void setTotal(double total) {
 		this.total = total;
 	}
 }

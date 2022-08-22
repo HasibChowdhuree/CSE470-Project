@@ -4,17 +4,12 @@
     <nav th:replace="base::navbar"></nav>
 </head>
 
-<body>
-    <p class="title has-text-centered" th:text="${shop.name}"></p>
-    <p th:text="${shop.description}"></p>
-    <br><br><br>
-
-    </div>
-
+<body style="margin-top: 130px;">
     <div class="container">
+        <h1 class="title has-text-centered"> Laptops </h1><br>
         <div class="columns is-multiline">
             <div th:if="${products!=null}" th:each="product: ${products}">
-                <div th:if="${product.shop.id==shop.id}">
+                <div th:if="${product.category.name=='Laptop'}">
                     <div class="column">
                         <a th:href="@{/product/{id}(id=${product.id})}">
                             <div class="card">
@@ -59,8 +54,8 @@
                 </div>
             </div>
         </div>
-
     </div>
+    <br><br><br>
 </body>
 <footer th:replace="base::footer">
 </footer>

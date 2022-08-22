@@ -17,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.gadgetmonkey.dao.AdminRepository;
 import com.gadgetmonkey.dao.CategoryRepository;
 import com.gadgetmonkey.dao.CustomerRepository;
 import com.gadgetmonkey.dao.ProductsRepository;
 import com.gadgetmonkey.dao.ShopOwnerRepository;
 import com.gadgetmonkey.dao.ShopRepository;
 import com.gadgetmonkey.dao.UserRepository;
+import com.gadgetmonkey.entities.Admin;
 import com.gadgetmonkey.entities.Category;
 import com.gadgetmonkey.entities.Customer;
 import com.gadgetmonkey.entities.Product;
@@ -50,6 +52,8 @@ public class MainController {
 	private CategoryRepository categoryRepository;
 	@Autowired 
 	private ShopRepository shopRepository;
+	@Autowired
+	private AdminRepository adminRepository;
 	@GetMapping("/")
 	public String home(Model model, Principal principal, HttpSession session) {
 		model.addAttribute("title", "gadgetmonkey");
@@ -61,22 +65,36 @@ public class MainController {
 		catch(Exception e){
 
 		}
+		Object user = isLogged(principal);
+		List<Category> categories = categoryRepository.findAll();
+		model.addAttribute("categories", categories);
+		model.addAttribute("user", user);
+		Cart cart =(Cart) session.getAttribute("cart");
 		List<Product> products;
-		if(productsRepository.findAll().size()>5)
-			products = productsRepository.findAll().subList(0, 6);
-		else
-			products = productsRepository.findAll();
-		Cart cart = (Cart) session.getAttribute("cart");
+		products = productsRepository.findAll();
 		model.addAttribute("cart", cart);
 		model.addAttribute("products", products);
-		List<Product> featured_products = new ArrayList<>();
+		List<Product> featured = new ArrayList<>();
 		for(Product product: products){
-			if(product.getCategory().getName().equals("Smartphone")){
-				featured_products.add(product);
+			if(product.getId()==6 ){
+				featured.add(product);
+			}
+			if(product.getId()==18 ){
+				featured.add(product);
+			}
+			if(product.getId()==22 ){
+				featured.add(product);
+			}
+			if(product.getId()==23 ){
+				featured.add(product);
 			}
 		}
-		model.addAttribute("featured_products", featured_products);
-		model.addAttribute("title", "Men's world");
+		model.addAttribute("featured", featured);
+
+
+
+
+		model.addAttribute("title", "gadgetmonkey");
 		// Customer us = new Customer();
 		// System.out.print(us.getId());
 		// customerRepository.save(us);
@@ -134,8 +152,11 @@ public class MainController {
 		if(type.equals("ROLE_SHOP")){
 			user = new ShopOwner();
 		}
-		else{
+		else if(type.equals("ROLE_CUSTOMER")){
 			user = new Customer();
+		}
+		else{
+			user = new Admin();
 		}
 		user.setName(fullname);
 		user.setEmail(email);
@@ -154,9 +175,12 @@ public class MainController {
 				shopowner.setShop(shop);
 				this.shopownerRepository.save(shopowner);
 			}
-			else {
+			else if(type.equals("ROLE_CUSTOMER")){
 				this.customerRepository.save((Customer)user);
 			} 
+			else{
+				this.adminRepository.save((Admin)user);
+			}
 			model.addAttribute("user",user);
 			session.setAttribute("message",new Message("Successfully registered! ","notification is-success"));
 			return new RedirectView("/login");
@@ -168,6 +192,40 @@ public class MainController {
 			return new RedirectView("/signup/"+type);
 		}
 	}
+	// @GetMapping("/admin-signup")
+    // public String admin_signup(Model model){
+    //     model.addAttribute("title", "signup");
+	// 	model.addAttribute("type","ROLE_ADMIN");
+	// 	return "signup";
+    // }
+	// @PostMapping("/admin-signup")
+    // public RedirectView admin_signup(@RequestParam("fullname") String fullname, @RequestParam("email") String email,
+	// 		@RequestParam("password") String password,@PathVariable String type, Model model,
+	// 		HttpSession session) {
+	// 	Admin user = new Admin();
+	// 	user.setName(fullname);
+	// 	user.setEmail(email);
+	// 	user.setRole("ROLE_ADMIN");
+	// 	try {
+	// 		if(customerRepository.getUserByEmail(email)!=null) {
+	// 			throw new Exception("user email already exists");
+	// 		}
+	// 		if(password.length()<6) {
+	// 			throw new Exception("password length must be at least 6");
+	// 		}
+	// 		user.setPassword(passwordEncoder.encode(password));
+	// 		adminRepository.save(user);
+	// 		model.addAttribute("user",user);
+	// 		session.setAttribute("message",new Message("Successfully registered! ","notification is-success"));
+	// 		return new RedirectView("/login");
+	// 	}
+	// 	catch(Exception e) {
+	// 		e.printStackTrace();
+	// 		model.addAttribute("user",user);
+	// 		session.setAttribute("message",new Message(e.getMessage(),"notification is-danger"));
+	// 		return new RedirectView("/admin-signup/"+type);
+	// 	}
+    // }
 	@GetMapping("/selectsignup")
 	public String selectSignup(Model model){
 		model.addAttribute("title", "Select Option");
@@ -256,5 +314,72 @@ public class MainController {
 		model.addAttribute("customer", customer);
 		model.addAttribute("product",product);
 		return "singleproduct";
+	}
+	@GetMapping("/shops")
+	public String shops(Model model, Principal principal, HttpSession session){
+		List<Shop> allShop = shopRepository.findAll();
+		Object user = isLogged(principal);
+		model.addAttribute("user", user);
+		model.addAttribute("title", "Shops");
+		model.addAttribute("shops", allShop);
+		Cart cart =(Cart) session.getAttribute("cart");
+		model.addAttribute("cart",cart);
+		return "shops";
+	}
+	@GetMapping(value = ("/shops/{id}"))
+	public String singleShop(@PathVariable int id, Model model, Principal principal, HttpSession session){
+		Shop shop = shopRepository.getReferenceById(id);
+		List<Product> allProduct = productsRepository.findAll();
+		Object customer = isLogged(principal);
+		Cart cart = (Cart) session.getAttribute("cart");
+		model.addAttribute("cart", cart);
+		model.addAttribute("customer", customer);
+		model.addAttribute("shop",shop);
+		model.addAttribute("products",allProduct);
+		return "singleshop";
+	}
+	@GetMapping(value = ("/phones"))
+	public String phones(Model model, Principal principal, HttpSession session){
+		List<Product> allProduct = productsRepository.findAll();
+		Object customer = isLogged(principal);
+		Cart cart = (Cart) session.getAttribute("cart");
+		model.addAttribute("cart", cart);
+		model.addAttribute("title", "Phones");
+		model.addAttribute("customer", customer);
+		model.addAttribute("products",allProduct);
+		return "phones";
+	}
+	@GetMapping(value = ("/laptops"))
+	public String laptops(Model model, Principal principal, HttpSession session){
+		List<Product> allProduct = productsRepository.findAll();
+		Object customer = isLogged(principal);
+		Cart cart = (Cart) session.getAttribute("cart");
+		model.addAttribute("cart", cart);
+		model.addAttribute("title", "Laptops");
+		model.addAttribute("customer", customer);
+		model.addAttribute("products",allProduct);
+		return "laptops";
+	}
+	@GetMapping(value = ("/tablets"))
+	public String tablets(Model model, Principal principal, HttpSession session){
+		List<Product> allProduct = productsRepository.findAll();
+		Object customer = isLogged(principal);
+		Cart cart = (Cart) session.getAttribute("cart");
+		model.addAttribute("cart", cart);
+		model.addAttribute("title", "Tablets");
+		model.addAttribute("customer", customer);
+		model.addAttribute("products",allProduct);
+		return "tablets";
+	}
+	@GetMapping(value = ("/accessories"))
+	public String accessories(Model model, Principal principal, HttpSession session){
+		List<Product> allProduct = productsRepository.findAll();
+		Object customer = isLogged(principal);
+		Cart cart = (Cart) session.getAttribute("cart");
+		model.addAttribute("cart", cart);
+		model.addAttribute("title", "Accessories");
+		model.addAttribute("customer", customer);
+		model.addAttribute("products",allProduct);
+		return "accessories";
 	}
 }

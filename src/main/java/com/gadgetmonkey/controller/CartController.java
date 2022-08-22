@@ -2,6 +2,7 @@ package com.gadgetmonkey.controller;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,16 +11,22 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.gadgetmonkey.dao.CustomerRepository;
 import com.gadgetmonkey.dao.ProductsRepository;
 import com.gadgetmonkey.dao.ShopRepository;
 import com.gadgetmonkey.dao.UserRepository;
+import com.gadgetmonkey.entities.Coupon;
 import com.gadgetmonkey.entities.Customer;
 import com.gadgetmonkey.entities.Product;
+import com.gadgetmonkey.entities.Shop;
 import com.gadgetmonkey.utilities.Cart;
+import com.gadgetmonkey.utilities.Message;
 import com.gadgetmonkey.utilities.Pair;
 
 import org.springframework.ui.Model;
@@ -98,10 +105,13 @@ public class CartController {
         model.addAttribute("cart", cart);
         if(cart!=null){
             cart.calculateTotal();
+            cart.setTotal_after_discount(cart.getTotal());
+            // cart.getTotal_after_discount(null,0);
+            // cart.getTotal_after_charges();
             List<Pair> pairs = cart.getProducts();
+            // cart.setCoupon(null);
             model.addAttribute("pairs", pairs);
         }
-       
         model.addAttribute("title", "carts");
         return "cart";
     }
@@ -122,6 +132,8 @@ public class CartController {
         //     products.add(pair.getProduct());
         // }
         cart.calculateTotal();
+        cart.setTotal_after_discount(cart.getTotal());
+        cart.setCoupon(null);
         model.addAttribute("cart", cart);
         // model.addAttribute("pairs", pairs);
         // model.addAttribute("title", "carts");
@@ -136,6 +148,8 @@ public class CartController {
             }
         }
         cart.calculateTotal();
+        cart.setTotal_after_discount(cart.getTotal());
+        cart.setCoupon(null);
         session.setAttribute("cart", cart);
         return new RedirectView("/cart");
     }
@@ -154,7 +168,39 @@ public class CartController {
             }
         }
         cart.calculateTotal();
+        cart.setTotal_after_discount(cart.getTotal());
+        cart.setCoupon(null);
         session.setAttribute("cart", cart);
         return new RedirectView("/cart");
+    }
+    @PostMapping("/add-coupon")
+    public String add_coupon(@RequestParam(required = false) String coupon,Model model, Principal principal, HttpSession session){
+        Cart cart = (Cart)session.getAttribute("cart");
+        List<Pair> products = cart.getProducts();
+        Coupon coupon_obj = new Coupon();
+        coupon_obj.setName(coupon);
+        cart.setCoupon(coupon_obj);
+        // cart.setCoupon(coupon_obj);
+        HashMap<Shop,List<Coupon>> available_coupons = new HashMap<Shop,List<Coupon>>();
+        for(Pair pair: products){
+            Product product = pair.getProduct();
+            available_coupons.put(product.getShop(),product.getShop().getCoupons());
+        }
+        // System.out.println(coupon);
+        for(Shop shop:available_coupons.keySet()){
+            for(Coupon coup:available_coupons.get(shop)){
+                // System.out.println(coup.getName());
+                if(coup.getName().equals(coupon)){
+                    double price_after_discount = cart.getTotal_after_discount(shop, coup.getPercentage());
+                    cart.setTotal_after_discount(price_after_discount);
+                    break;
+                }
+            }
+        }
+        model.addAttribute("cart", cart);
+        model.addAttribute("pairs", products);
+        model.addAttribute("title", "carts");
+        session.setAttribute("message",new Message("Coupon added successfully","notification is-success"));
+        return "cart";
     }
 }

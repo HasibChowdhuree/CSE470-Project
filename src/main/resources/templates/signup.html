@@ -1,68 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head th:replace="base::header">
-    <nav th:replace="base::navbar"></nav>
+  <nav th:replace="base::navbar"></nav>
 </head>
+
 <body>
-    <div class="column is-half is-offset-one-quarter center">
-        <p>New Signup</p>
-    </div>
-    <div class="card column is-half is-offset-one-quarter">     
-      <form th:action="@{/signup/{type}(type=${type})}" method="post">
+  <br><br><br><br><br>
+  <div class="columns is-centered  has-text-centered">
+    <div class="card column is-4">
+      <form class="signup-login-form" th:action="@{/signup/{type}(type=${type})}" method="post">
+        <br>
+        <div>
+          <h1 class="title" style="text-align: center;">Sign Up</h1><br>
+        </div>
         <div th:if="${session.message}" th:classappend="${session.message.type}" class="alert" role="alert">
-          <p class="text-center" th:text="${session.message.content}"> <p>
-          <th:block th:text="${#session.removeAttribute('message')}"></th:block>
+          <p class="text-center" th:text="${session.message.content}">
+          <p>
+            <th:block th:text="${#session.removeAttribute('message')}"></th:block>
         </div>
         <div class="field">
-            <label class="label">Full Name</label>
-            <div class="control has-icons-left has-icons-right">
-              <input class="input is-success" name="fullname" type="text" placeholder="Full Name">
-              <span class="icon is-small is-left">
-                <i class="fas fa-user"></i>
-              </span>
-            </div>
-            <!-- <p class="help is-success">This username is available</p> -->
+          <div class="control has-icons-left has-icons-right">
+            <input class="input is-info" name="fullname" type="text" placeholder="Full Name">
+            <span class="icon is-small is-left">
+              <i class="fas fa-user"></i>
+            </span>
           </div>
-          
-          <div class="field">
-            <label class="label">Email</label>
-            <div class="control has-icons-left has-icons-right">
-              <input class="input is-success" name="email" type="email" placeholder="Email input">
-              <span class="icon is-small is-left">
-                <i class="fas fa-envelope"></i>
-              </span>
+          <!-- <p class="help is-success">This username is available</p> -->
+        </div>
 
-            </div>
-            <!-- <p class="help is-danger">This email is invalid</p> -->
+        <div class="field">
+          <div class="control has-icons-left has-icons-right">
+            <input class="input is-info" name="email" type="email" placeholder="Email input">
+            <span class="icon is-small is-left">
+              <i class="fas fa-envelope"></i>
+            </span>
+
           </div>
-          <div class="field">
-            <label class="label">Password</label>
-            <p class="control has-icons-left">
-              <input class="input is-success" name="password" type="password" placeholder="Password">
-              <span class="icon is-small is-left">
-                <i class="fas fa-lock"></i>
-              </span>
-            </p>
-          </div>
-          <div class="field">
-            <div class="control">
-              <label class="checkbox">
-                <input type="checkbox">
-                I agree to the <a href="#">terms and conditions</a>
-              </label>
-            </div>
-          </div>
-          
-          
-          <div class="field is-grouped">
-            <div class="control">
-              <button class="button is-success">Submit</button>
-            </div>
-            <div class="control">
-              <button class="button is-danger is-light">Cancel</button>
-            </div>
-          </div>
-        </form>
+          <!-- <p class="help is-danger">This email is invalid</p> -->
+        </div>
+        <div class="field">
+          <p class="control has-icons-left">
+            <input class="input is-info" name="password" type="password" placeholder="Password">
+            <span class="icon is-small is-left">
+              <i class="fas fa-lock"></i>
+            </span>
+          </p>
+        </div>
+        <br>
+        <p>Already have an account?? Click here to<a style="color: rgb(255, 187, 0);" th:href="@{/login}"> Login</a></p>
+        <br>
+        <button style="margin-bottom: 30px;" class="button is-info">Sign Up</button>
+
     </div>
+    </form>
+  </div>
 </body>
+<footer th:replace="base::footer">
+</footer>
+
 </html>

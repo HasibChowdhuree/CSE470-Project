@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import com.gadgetmonkey.dao.ShopOwnerRepository;
 import com.gadgetmonkey.dao.ShopRepository;
 import com.gadgetmonkey.dao.UserRepository;
 import com.gadgetmonkey.entities.Category;
+import com.gadgetmonkey.entities.Coupon;
 import com.gadgetmonkey.entities.Order;
 import com.gadgetmonkey.entities.Product;
 import com.gadgetmonkey.entities.Shop;
@@ -113,6 +115,7 @@ public class ShopOwnerController {
         product.setDescription(description);
         product.setPrice(price);
         product.setQuantity(quantity);
+        product.setShop(shop);
         List<Category> cat = categoryRepository.findAll();
         for (Category category2 : cat) {
             if(category2.getName().equals(category)){
@@ -176,6 +179,7 @@ public class ShopOwnerController {
                 break;
             }
         }
+        product.setShop(null);
         product.setCategory(null);
         this.productsRepository.delete(product);
         model.addAttribute("user", user);
@@ -212,20 +216,42 @@ public class ShopOwnerController {
         ShopOwner user = shopOwnerRepository.getUserByEmail(email);
         Shop shop = user.getShop();
 
-        List<Product> prod = shop.getProducts();
-        Order o = new Order();
-        o.setName("customer#1");
-        o.setQuantity(5);
-        o.setTotal(500);
-        o.setProducts(prod);
         List<Order> orders = shop.getOrders();
-        orders.add(o);
-        orders.add(o);
-
+        // Order o = new Order();
+        // o.setName("customer#1");
+        // o.setQuantity(5);
+        // o.setTotal(500);
+        // o.setProducts(prod);
+        // List<Order> orders = shop.getOrders();
+        // orders.add(o);
+        // orders.add(o);
+        model.addAttribute("orders", orders);
+        System.out.println(orders.get(0).getTotal());
         // System.out.println(orders);
         model.addAttribute("user", user);
-        model.addAttribute("orders", orders);
+        // model.addAttribute("orders", orders);
         model.addAttribute("title", "view orders");
         return "view_orders";
+    }
+    @GetMapping("/add-coupon")
+    public String add_coupon(Model model, Principal principal){
+        String email = principal.getName();
+        ShopOwner user = shopOwnerRepository.getUserByEmail(email);
+        Shop shop = user.getShop();
+        List<Coupon> coupons = shop.getCoupons();
+        model.addAttribute("user", user);
+        model.addAttribute("coupons", coupons);
+        model.addAttribute("title", "add coupon");
+        return "add_coupon";
+    }
+    @PostMapping("/add-coupon")
+    public RedirectView save_coupon(@ModelAttribute Coupon coupon, Principal principal, HttpSession session){
+        String email = principal.getName();
+        ShopOwner user = shopOwnerRepository.getUserByEmail(email);
+        Shop shop = user.getShop();
+        shop.getCoupons().add(coupon);
+        shopRepository.save(shop);
+        session.setAttribute("message",new Message("Coupon added: "+coupon.getName(),"notification is-success"));
+        return new RedirectView("/shop/add-coupon");
     }
 }

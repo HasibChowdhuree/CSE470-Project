@@ -8,10 +8,10 @@
 		<version>2.7.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.gadgetmonkey</groupId>
-	<artifactId>gadgetmonkeymvc</artifactId>
+	<groupId>com.groove</groupId>
+	<artifactId>groovemvc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gadgetmonkey</name>
+	<name>groove</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>

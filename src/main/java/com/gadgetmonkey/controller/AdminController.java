@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +19,14 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.gadgetmonkey.dao.AdminRepository;
 import com.gadgetmonkey.dao.CategoryRepository;
+import com.gadgetmonkey.dao.OrderRepository;
 import com.gadgetmonkey.dao.ShopRepository;
 import com.gadgetmonkey.entities.Admin;
 import com.gadgetmonkey.entities.Category;
+import com.gadgetmonkey.entities.Order;
 import com.gadgetmonkey.entities.Shop;
 import com.gadgetmonkey.utilities.Message;
 
-import net.bytebuddy.dynamic.scaffold.MethodGraph.NodeList;
 
 @Controller
 @RequestMapping("/admin")
@@ -35,6 +37,8 @@ public class AdminController {
     private CategoryRepository categoryRepository;
     @Autowired
     private ShopRepository shopRepository;
+    @Autowired
+    private OrderRepository orderRepository;
     @GetMapping("/dashboard")
     public String dashboard(Model model, Principal principal){
         String email = principal.getName();
@@ -99,5 +103,22 @@ public class AdminController {
         model.addAttribute("user",user);
         model.addAttribute("shops", shops);
         return new RedirectView("/admin/pending-shops");
+    }
+    @GetMapping("/view-order")
+    public String view_orders(Model model, Principal principal){
+        String email = principal.getName();
+        Admin user = adminRepository.getUserByEmail(email); 
+        List<Shop> shops = shopRepository.findAll();
+        List<Order> orders = orderRepository.findAll();
+        model.addAttribute("title", "orders");
+        model.addAttribute("user",user);
+        model.addAttribute("orders", orders);
+        model.addAttribute("shops", shops);
+        return "view_orders";
+    }
+    @GetMapping("signup")
+    public String admin_signup(Model model){
+        model.addAttribute("title", "signup");
+		return "signup";
     }
 }
